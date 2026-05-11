@@ -82,3 +82,5 @@ docker compose run --rm catalog_service python init_db.py
 ## Later phases
 
 `docker-compose.yml` includes commented placeholders for `frontend_service` and `order_service`. Those services are not implemented yet and are not part of the current run workflow.
+
+`docker-compose.lab2.yml` is a Lab 2 structure skeleton for a future one-frontend, two-catalog-replica, and two-order-replica setup. It is not runnable yet and should not be used for current Part 1 testing.
