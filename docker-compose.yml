@@ -1,0 +1,40 @@
+services:
+  catalog_service:
+    build:
+      context: ./catalog_service
+    ports:
+      - "5001:5001"
+    environment:
+      CATALOG_DB_PATH: /data/catalog.db
+    volumes:
+      - catalog_data:/data
+
+  # Part 1 services to add later:
+  # frontend_service:
+  #   build:
+  #     context: ./frontend_service
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     CATALOG_SERVICE_URL: http://catalog_service:5001
+  #     ORDER_SERVICE_URL: http://order_service:5002
+  #   depends_on:
+  #     - catalog_service
+  #     - order_service
+  #
+  # order_service:
+  #   build:
+  #     context: ./order_service
+  #   ports:
+  #     - "5002:5002"
+  #   environment:
+  #     CATALOG_SERVICE_URL: http://catalog_service:5001
+  #     ORDER_DB_PATH: /data/orders.db
+  #   volumes:
+  #     - order_data:/data
+  #   depends_on:
+  #     - catalog_service
+
+volumes:
+  catalog_data:
+  # order_data:
