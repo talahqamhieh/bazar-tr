@@ -1,12 +1,16 @@
 import sqlite3
 
-from db import DB_PATH
+from config import DB_PATH
 
 BOOKS = [
     (1, "How to get a good grade in DOS in 40 minutes a day", "distributed systems", 40, 8),
     (2, "RPCs for Noobs", "distributed systems", 50, 5),
     (3, "Xen and the Art of Surviving Undergraduate School", "undergraduate school", 35, 7),
     (4, "Cooking for the Impatient Undergrad", "undergraduate school", 25, 6),
+    # Lab 2 placeholder values until the lab specifies exact catalog fields.
+    (5, "How to finish Project 3 on time", "distributed systems", 45, 4),
+    (6, "Why theory classes are so hard", "undergraduate school", 30, 5),
+    (7, "Spring in the Pioneer Valley", "undergraduate school", 20, 4),
 ]
 
 

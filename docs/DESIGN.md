@@ -37,7 +37,9 @@ The catalog uses one SQLite table named `books` with:
 - `price`
 - `quantity`
 
-The starter dataset contains four books with stable IDs from 1 to 4.
+The starter dataset contains seven books with stable IDs from 1 to 7. Books 1 through 4 are the original Part 1 dataset. Books 5 through 7 are the Lab 2 additions.
+
+For future replica runs, the same catalog codebase can use environment variables such as `CATALOG_DB_PATH`, `CATALOG_SERVICE_NAME`, and `CATALOG_PORT` so each replica can use its own database file and log label.
 
 ## Staged Docker approach
 

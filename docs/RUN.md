@@ -25,7 +25,7 @@ If `py` is not available on your machine, use `python` or `python3` with the sam
 
 ## Initialize the catalog database locally
 
-`py init_db.py` creates the `books` table and inserts the four starter books. It also clears existing rows before re-seeding, so use it when you want a fresh local database.
+`py init_db.py` creates the `books` table and inserts the seven starter books. It also clears existing rows before re-seeding, so use it when you want a fresh local database.
 
 By default, the SQLite file is stored at `catalog_service/catalog.db`.
 

@@ -3,6 +3,7 @@ import logging
 from flask import Flask, jsonify, request
 
 from db import get_book_by_id, search_books_by_topic, update_book_by_id
+from config import DB_PATH, PORT, SERVICE_NAME
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +22,7 @@ def bad_request(error):
 
 @app.get("/search/<topic>")
 def search(topic):
-    logger.info("Incoming request: GET /search/%s", topic)
+    logger.info("[%s] Incoming request: GET /search/%s", SERVICE_NAME, topic)
     books = search_books_by_topic(topic)
     if not books:
         # Unknown topics return 404 JSON instead of an empty list.
@@ -33,7 +34,7 @@ def search(topic):
 
 @app.get("/info/<item_id>")
 def info(item_id):
-    logger.info("Incoming request: GET /info/%s", item_id)
+    logger.info("[%s] Incoming request: GET /info/%s", SERVICE_NAME, item_id)
     if not item_id.isdigit():
         logger.info("Failure: invalid item_id '%s'", item_id)
         return jsonify({"message": "Invalid item_id"}), 400
@@ -53,7 +54,7 @@ def _is_non_negative_int(value):
 
 @app.put("/update/<item_id>")
 def update(item_id):
-    logger.info("Incoming request: PUT /update/%s", item_id)
+    logger.info("[%s] Incoming request: PUT /update/%s", SERVICE_NAME, item_id)
     if not item_id.isdigit():
         logger.info("Validation failure: invalid item_id '%s'", item_id)
         return jsonify({"message": "Invalid item_id"}), 400
@@ -91,4 +92,5 @@ def update(item_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    logger.info("Starting %s on port %s with database %s", SERVICE_NAME, PORT, DB_PATH)
+    app.run(host="0.0.0.0", port=PORT)
