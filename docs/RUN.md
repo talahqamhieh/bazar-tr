@@ -128,6 +128,19 @@ py app.py
 
 Use `http://127.0.0.1:5000` as the client entry point. The front-end forwards search and info requests to the catalog service and purchase requests to the order service.
 
+## Run the front-end with replica round-robin (Lab 2)
+
+After the catalog and order replicas are running, start the front-end with replica URL lists:
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\frontend_service"
+$env:CATALOG_REPLICA_URLS = "http://127.0.0.1:5001,http://127.0.0.1:5011"
+$env:ORDER_REPLICA_URLS = "http://127.0.0.1:5002,http://127.0.0.1:5012"
+py app.py
+```
+
+If those env vars are not set, the front-end still defaults to the single Part 1 URLs on ports `5001` and `5002`.
+
 ## Test the integrated local stack through the front-end
 
 ```powershell
@@ -178,4 +191,4 @@ docker compose run --rm catalog_service python init_db.py
 
 `docker-compose.yml` includes commented placeholders for `frontend_service` and `order_service`. Those services are implemented locally, but they are not part of the current Docker workflow yet.
 
-`docker-compose.lab2.yml` can run two independent catalog replicas and two independent order replicas in Docker. It does not yet run the Lab 2 frontend replica-routing stack.
+`docker-compose.lab2.yml` can run catalog replicas, order replicas, and the front-end with replica URL lists in Docker.

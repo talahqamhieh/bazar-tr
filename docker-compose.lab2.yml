@@ -4,7 +4,8 @@
 # order replicas from the same codebases.
 #
 # Not implemented yet in this file:
-# - frontend load balancing or cache
+# - frontend cache
+# - cache invalidation
 # - replica synchronization
 # - performance measurements
 #
@@ -65,24 +66,22 @@ services:
     depends_on:
       - catalog_service_1
 
+  frontend_service:
+    build:
+      context: ./frontend_service
+    ports:
+      - "5000:5000"
+    environment:
+      CATALOG_REPLICA_URLS: http://catalog_service_1:5001,http://catalog_service_2:5001
+      ORDER_REPLICA_URLS: http://order_service_1:5002,http://order_service_2:5002
+    depends_on:
+      - catalog_service_1
+      - catalog_service_2
+      - order_service_1
+      - order_service_2
+
 volumes:
   catalog_data_1:
   catalog_data_2:
   order_data_1:
   order_data_2:
-
-# Planned later Lab 2 services:
-#
-# frontend_service:
-#   build:
-#     context: ./frontend_service
-#   ports:
-#     - "5000:5000"
-#   environment:
-#     CATALOG_REPLICA_URLS: http://catalog_service_1:5001,http://catalog_service_2:5001
-#     ORDER_REPLICA_URLS: http://order_service_1:5002,http://order_service_2:5002
-#   depends_on:
-#     - catalog_service_1
-#     - catalog_service_2
-#     - order_service_1
-#     - order_service_2

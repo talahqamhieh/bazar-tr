@@ -4,11 +4,15 @@ from urllib.parse import quote
 from flask import Flask, jsonify
 
 from client import forward_request
-from config import CATALOG_SERVICE_URL, ORDER_SERVICE_URL
+from config import CATALOG_REPLICA_URLS, ORDER_REPLICA_URLS
+from load_balancer import RoundRobin
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+catalog_balancer = RoundRobin(CATALOG_REPLICA_URLS, "catalog_service")
+order_balancer = RoundRobin(ORDER_REPLICA_URLS, "order_service")
 
 
 @app.errorhandler(404)
@@ -39,8 +43,10 @@ def _proxy_response(status_code, payload):
 
 @app.get("/search/<topic>")
 def search(topic):
-    url = f"{CATALOG_SERVICE_URL.rstrip('/')}/search/{quote(topic, safe='')}"
+    replica_name, base_url = catalog_balancer.next_replica()
+    url = f"{base_url.rstrip('/')}/search/{quote(topic, safe='')}"
     logger.info("Incoming request: GET /search/%s", topic)
+    logger.info("Catalog request routed to %s", replica_name)
     logger.info("Backend call target: GET %s", url)
     status_code, payload = forward_request("GET", url)
     return _proxy_response(status_code, payload)
@@ -48,8 +54,10 @@ def search(topic):
 
 @app.get("/info/<item_id>")
 def info(item_id):
-    url = f"{CATALOG_SERVICE_URL.rstrip('/')}/info/{item_id}"
+    replica_name, base_url = catalog_balancer.next_replica()
+    url = f"{base_url.rstrip('/')}/info/{item_id}"
     logger.info("Incoming request: GET /info/%s", item_id)
+    logger.info("Catalog request routed to %s", replica_name)
     logger.info("Backend call target: GET %s", url)
     status_code, payload = forward_request("GET", url)
     return _proxy_response(status_code, payload)
@@ -57,8 +65,10 @@ def info(item_id):
 
 @app.post("/purchase/<item_id>")
 def purchase(item_id):
-    url = f"{ORDER_SERVICE_URL.rstrip('/')}/purchase/{item_id}"
+    replica_name, base_url = order_balancer.next_replica()
+    url = f"{base_url.rstrip('/')}/purchase/{item_id}"
     logger.info("Incoming request: POST /purchase/%s", item_id)
+    logger.info("Order request routed to %s", replica_name)
     logger.info("Backend call target: POST %s", url)
     status_code, payload = forward_request("POST", url)
     return _proxy_response(status_code, payload)
