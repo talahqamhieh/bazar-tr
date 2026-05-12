@@ -59,6 +59,38 @@ Each replica keeps its own SQLite file. Updates on one replica do not change the
 
 To reinitialize one replica, run `py init_db.py` again in that replica's terminal with the same environment variables.
 
+## Run two local order replicas (Lab 2)
+
+Start one catalog service first, for example replica 1 on port `5001`. Then use two terminals in `order_service`.
+
+Order replica 1:
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service"
+$env:ORDER_SERVICE_NAME = "order_service_1"
+$env:ORDER_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service\orders.db"
+$env:ORDER_PORT = "5002"
+$env:CATALOG_SERVICE_URL = "http://127.0.0.1:5001"
+py init_db.py
+py app.py
+```
+
+Order replica 2:
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service"
+$env:ORDER_SERVICE_NAME = "order_service_2"
+$env:ORDER_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service\orders_replica_2.db"
+$env:ORDER_PORT = "5012"
+$env:CATALOG_SERVICE_URL = "http://127.0.0.1:5001"
+py init_db.py
+py app.py
+```
+
+Each order replica keeps its own SQLite log file. Purchases handled by one replica are logged only in that replica's database.
+
+To reinitialize one order replica database, run `py init_db.py` again in that replica's terminal with the same environment variables.
+
 ## Test the catalog service locally
 
 With the service running, try:
@@ -146,4 +178,4 @@ docker compose run --rm catalog_service python init_db.py
 
 `docker-compose.yml` includes commented placeholders for `frontend_service` and `order_service`. Those services are implemented locally, but they are not part of the current Docker workflow yet.
 
-`docker-compose.lab2.yml` can run two independent catalog replicas in Docker. It does not yet run the full Lab 2 frontend/order replica stack.
+`docker-compose.lab2.yml` can run two independent catalog replicas and two independent order replicas in Docker. It does not yet run the Lab 2 frontend replica-routing stack.

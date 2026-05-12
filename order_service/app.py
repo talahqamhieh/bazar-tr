@@ -1,16 +1,14 @@
 import logging
-import os
 
 from flask import Flask, jsonify
 
 from client import get_item_info, update_item_quantity
+from config import CATALOG_SERVICE_URL, DB_PATH, PORT, SERVICE_NAME
 from db import init_db, log_purchase
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-CATALOG_SERVICE_URL = os.environ.get("CATALOG_SERVICE_URL", "http://127.0.0.1:5001")
 
 init_db()
 
@@ -32,7 +30,7 @@ def server_error(error):
 
 @app.post("/purchase/<item_id>")
 def purchase(item_id):
-    logger.info("Incoming request: POST /purchase/%s", item_id)
+    logger.info("[%s] Incoming request: POST /purchase/%s", SERVICE_NAME, item_id)
     if not item_id.isdigit():
         logger.info("Failure: invalid item_id '%s'", item_id)
         return jsonify({"message": "Invalid item_id"}), 400
@@ -72,4 +70,11 @@ def purchase(item_id):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002)
+    logger.info(
+        "Starting %s on port %s with database %s and catalog %s",
+        SERVICE_NAME,
+        PORT,
+        DB_PATH,
+        CATALOG_SERVICE_URL,
+    )
+    app.run(host="0.0.0.0", port=PORT)
