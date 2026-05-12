@@ -141,7 +141,7 @@ py app.py
 
 If those env vars are not set, the front-end still defaults to the single Part 1 URLs on ports `5001` and `5002`.
 
-The front-end keeps an in-memory cache for catalog read responses (`GET /info/<item_id>` and `GET /search/<topic>`). There is no cache invalidation yet, so cached reads can become stale after catalog updates.
+The front-end keeps an in-memory cache for catalog read responses (`GET /info/<item_id>` and `GET /search/<topic>`). Before a purchase updates catalog quantity, the order service calls `POST /internal/invalidate/<item_id>` on the front-end. Search cache entries are cleared on invalidation because quantity or price changes can make topic search results stale.
 
 ## Test the integrated local stack through the front-end
 

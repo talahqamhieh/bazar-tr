@@ -81,6 +81,23 @@ def info(item_id):
     )
 
 
+@app.post("/internal/invalidate/<item_id>")
+def invalidate(item_id):
+    logger.info("Invalidation request received for item_id %s", item_id)
+    if not item_id.isdigit():
+        return jsonify({"message": "Invalid item_id"}), 400
+
+    removed_info, removed_search_count = catalog_cache.invalidate_item(item_id)
+    if removed_info:
+        logger.info("Cache entry removed for key %s", info_cache_key(item_id))
+    else:
+        logger.info("Cache key not present for key %s", info_cache_key(item_id))
+    if removed_search_count:
+        logger.info("Cleared %d cached search entries", removed_search_count)
+
+    return jsonify({"message": "Cache invalidated", "item_id": int(item_id)}), 200
+
+
 @app.post("/purchase/<item_id>")
 def purchase(item_id):
     replica_name, base_url = order_balancer.next_replica()

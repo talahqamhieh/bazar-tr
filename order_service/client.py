@@ -36,3 +36,9 @@ def update_item_quantity(base_url, item_id, quantity):
     url = f"{base_url.rstrip('/')}/update/{item_id}"
     logger.info("Catalog update request: PUT %s quantity=%s", url, quantity)
     return _request_json("PUT", url, {"quantity": quantity})
+
+
+def invalidate_frontend_cache(base_url, item_id):
+    url = f"{base_url.rstrip('/')}/internal/invalidate/{item_id}"
+    logger.info("Frontend invalidation request: POST %s", url)
+    return _request_json("POST", url)

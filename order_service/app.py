@@ -2,8 +2,8 @@ import logging
 
 from flask import Flask, jsonify
 
-from client import get_item_info, update_item_quantity
-from config import CATALOG_SERVICE_URL, DB_PATH, PORT, SERVICE_NAME
+from client import get_item_info, invalidate_frontend_cache, update_item_quantity
+from config import CATALOG_SERVICE_URL, DB_PATH, FRONTEND_INVALIDATION_URL, PORT, SERVICE_NAME
 from db import init_db, log_purchase
 
 app = Flask(__name__)
@@ -50,6 +50,19 @@ def purchase(item_id):
         return jsonify({"message": "Item out of stock", "item_id": item_id_int}), 409
 
     new_quantity = quantity - 1
+    invalidate_status, _ = invalidate_frontend_cache(
+        FRONTEND_INVALIDATION_URL,
+        item_id,
+    )
+    if invalidate_status == 200:
+        logger.info("Cache invalidation completed for item_id %s", item_id)
+    else:
+        logger.info(
+            "Cache invalidation failed for item_id %s with status %s; continuing purchase",
+            item_id,
+            invalidate_status,
+        )
+
     update_status, update_body = update_item_quantity(
         CATALOG_SERVICE_URL,
         item_id,
