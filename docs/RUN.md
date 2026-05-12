@@ -1,6 +1,6 @@
 # Run Guide
 
-This guide matches the current repository state. Only the catalog service is implemented today. The front-end and order services will be added in later Part 1 phases.
+This guide matches the current repository state. The catalog, order, and front-end services can be run locally for Part 1 integration testing. Docker currently supports the catalog service only.
 
 ## Prerequisites
 
@@ -40,6 +40,39 @@ Invoke-RestMethod -Method Put -Uri "http://127.0.0.1:5001/update/2" -ContentType
 ```
 
 More examples are in `tests/sample_requests.md` and `docs/SAMPLE_OUTPUT.md`.
+
+## Run the full local Part 1 stack
+
+Start each service in its own terminal:
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service"
+py -m pip install -r requirements.txt
+py init_db.py
+py app.py
+```
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service"
+py -m pip install -r requirements.txt
+py app.py
+```
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\frontend_service"
+py -m pip install -r requirements.txt
+py app.py
+```
+
+Use `http://127.0.0.1:5000` as the client entry point. The front-end forwards search and info requests to the catalog service and purchase requests to the order service.
+
+## Test the integrated local stack through the front-end
+
+```powershell
+curl.exe "http://127.0.0.1:5000/search/distributed%20systems"
+curl.exe "http://127.0.0.1:5000/info/1"
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:5000/purchase/1"
+```
 
 ## Build and run the catalog service with Docker
 
@@ -81,6 +114,6 @@ docker compose run --rm catalog_service python init_db.py
 
 ## Later phases
 
-`docker-compose.yml` includes commented placeholders for `frontend_service` and `order_service`. Those services are not implemented yet and are not part of the current run workflow.
+`docker-compose.yml` includes commented placeholders for `frontend_service` and `order_service`. Those services are implemented locally, but they are not part of the current Docker workflow yet.
 
 `docker-compose.lab2.yml` is a Lab 2 structure skeleton for a future one-frontend, two-catalog-replica, and two-order-replica setup. It is not runnable yet and should not be used for current Part 1 testing.
