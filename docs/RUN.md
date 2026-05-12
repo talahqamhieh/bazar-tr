@@ -40,6 +40,7 @@ cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service"
 $env:CATALOG_SERVICE_NAME = "catalog_service_1"
 $env:CATALOG_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service\catalog.db"
 $env:CATALOG_PORT = "5001"
+$env:CATALOG_PEER_URL = "http://127.0.0.1:5011"
 py init_db.py
 py app.py
 ```
@@ -51,11 +52,12 @@ cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service"
 $env:CATALOG_SERVICE_NAME = "catalog_service_2"
 $env:CATALOG_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service\catalog_replica_2.db"
 $env:CATALOG_PORT = "5011"
+$env:CATALOG_PEER_URL = "http://127.0.0.1:5001"
 py init_db.py
 py app.py
 ```
 
-Each replica keeps its own SQLite file. Updates on one replica do not change the other yet.
+Each replica keeps its own SQLite file. Set `CATALOG_PEER_URL` to the other replica's base URL so public `PUT /update/<item_id>` writes sync to the peer through `POST /internal/sync_update/<item_id>`.
 
 To reinitialize one replica, run `py init_db.py` again in that replica's terminal with the same environment variables.
 

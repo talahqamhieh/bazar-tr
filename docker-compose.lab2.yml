@@ -4,9 +4,7 @@
 # order replicas from the same codebases.
 #
 # Not implemented yet in this file:
-# - frontend cache
-# - cache invalidation
-# - replica synchronization
+# - order replica synchronization
 # - performance measurements
 #
 # For current Part 1 single-catalog Docker work, use docker-compose.yml instead.
@@ -21,6 +19,7 @@ services:
       CATALOG_DB_PATH: /data/catalog.db
       CATALOG_SERVICE_NAME: catalog_service_1
       CATALOG_PORT: 5001
+      CATALOG_PEER_URL: http://catalog_service_2:5001
     volumes:
       - catalog_data_1:/data
 
@@ -33,6 +32,7 @@ services:
       CATALOG_DB_PATH: /data/catalog.db
       CATALOG_SERVICE_NAME: catalog_service_2
       CATALOG_PORT: 5001
+      CATALOG_PEER_URL: http://catalog_service_1:5001
     volumes:
       - catalog_data_2:/data
 
