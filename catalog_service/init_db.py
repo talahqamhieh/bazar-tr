@@ -1,6 +1,6 @@
 import sqlite3
 
-from config import DB_PATH
+from config import DB_PATH, SERVICE_NAME
 
 BOOKS = [
     (1, "How to get a good grade in DOS in 40 minutes a day", "distributed systems", 40, 8),
@@ -40,4 +40,4 @@ def init_db():
 
 if __name__ == "__main__":
     init_db()
-    print(f"Catalog database initialized at {DB_PATH}")
+    print(f"{SERVICE_NAME} database initialized at {DB_PATH}")

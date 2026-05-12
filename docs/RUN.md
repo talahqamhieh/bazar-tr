@@ -29,6 +29,36 @@ If `py` is not available on your machine, use `python` or `python3` with the sam
 
 By default, the SQLite file is stored at `catalog_service/catalog.db`.
 
+## Run two local catalog replicas (Lab 2)
+
+Use two terminals in `catalog_service`. Set the environment variables first, then initialize and start each replica.
+
+Replica 1:
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service"
+$env:CATALOG_SERVICE_NAME = "catalog_service_1"
+$env:CATALOG_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service\catalog.db"
+$env:CATALOG_PORT = "5001"
+py init_db.py
+py app.py
+```
+
+Replica 2:
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service"
+$env:CATALOG_SERVICE_NAME = "catalog_service_2"
+$env:CATALOG_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\catalog_service\catalog_replica_2.db"
+$env:CATALOG_PORT = "5011"
+py init_db.py
+py app.py
+```
+
+Each replica keeps its own SQLite file. Updates on one replica do not change the other yet.
+
+To reinitialize one replica, run `py init_db.py` again in that replica's terminal with the same environment variables.
+
 ## Test the catalog service locally
 
 With the service running, try:
@@ -116,4 +146,4 @@ docker compose run --rm catalog_service python init_db.py
 
 `docker-compose.yml` includes commented placeholders for `frontend_service` and `order_service`. Those services are implemented locally, but they are not part of the current Docker workflow yet.
 
-`docker-compose.lab2.yml` is a Lab 2 structure skeleton for a future one-frontend, two-catalog-replica, and two-order-replica setup. It is not runnable yet and should not be used for current Part 1 testing.
+`docker-compose.lab2.yml` can run two independent catalog replicas in Docker. It does not yet run the full Lab 2 frontend/order replica stack.

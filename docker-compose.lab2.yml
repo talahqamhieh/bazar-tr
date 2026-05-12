@@ -1,28 +1,46 @@
-# Lab 2 compose skeleton (structure only).
+# Lab 2 compose file for catalog replicas only.
 #
-# This file prepares the future Part 2 / Lab 2 topology. It is not runnable yet.
-# Do not use it for current Part 1 work. Use docker-compose.yml instead.
+# This file can run two independent catalog replicas from the same codebase.
+# Each replica uses its own database volume and service name.
 #
-# Planned topology:
-# - 1 frontend node (cache + load balancing)
-# - 2 catalog replicas
-# - 2 order replicas
-#
-# Future behavior not implemented yet:
-# - in-memory cache in the frontend
-# - round-robin load balancing
-# - cache invalidation before writes
+# Not implemented yet in this file:
+# - frontend load balancing or cache
+# - order replicas
 # - replica synchronization
 # - performance measurements
 #
-# When Lab 2 is implemented, uncomment the service blocks below and add the
-# required service directories, Dockerfiles, and application logic.
+# For current Part 1 single-catalog Docker work, use docker-compose.yml instead.
 
-services: {}
+services:
+  catalog_service_1:
+    build:
+      context: ./catalog_service
+    ports:
+      - "5001:5001"
+    environment:
+      CATALOG_DB_PATH: /data/catalog.db
+      CATALOG_SERVICE_NAME: catalog_service_1
+      CATALOG_PORT: 5001
+    volumes:
+      - catalog_data_1:/data
 
-volumes: {}
+  catalog_service_2:
+    build:
+      context: ./catalog_service
+    ports:
+      - "5011:5001"
+    environment:
+      CATALOG_DB_PATH: /data/catalog.db
+      CATALOG_SERVICE_NAME: catalog_service_2
+      CATALOG_PORT: 5001
+    volumes:
+      - catalog_data_2:/data
 
-# Planned Lab 2 services (commented until implemented):
+volumes:
+  catalog_data_1:
+  catalog_data_2:
+
+# Planned later Lab 2 services:
 #
 # frontend_service:
 #   build:
@@ -30,7 +48,6 @@ volumes: {}
 #   ports:
 #     - "5000:5000"
 #   environment:
-#     # Future preparation only: frontend will route to replica URLs.
 #     CATALOG_REPLICA_URLS: http://catalog_service_1:5001,http://catalog_service_2:5001
 #     ORDER_REPLICA_URLS: http://order_service_1:5002,http://order_service_2:5002
 #   depends_on:
@@ -38,29 +55,6 @@ volumes: {}
 #     - catalog_service_2
 #     - order_service_1
 #     - order_service_2
-#
-# catalog_service_1:
-#   build:
-#     context: ./catalog_service
-#   ports:
-#     - "5001:5001"
-#   environment:
-#     CATALOG_DB_PATH: /data/catalog.db
-#     # Future preparation only: replica identity for sync work.
-#     CATALOG_REPLICA_NAME: catalog_service_1
-#   volumes:
-#     - catalog_data_1:/data
-#
-# catalog_service_2:
-#   build:
-#     context: ./catalog_service
-#   ports:
-#     - "5011:5001"
-#   environment:
-#     CATALOG_DB_PATH: /data/catalog.db
-#     CATALOG_REPLICA_NAME: catalog_service_2
-#   volumes:
-#     - catalog_data_2:/data
 #
 # order_service_1:
 #   build:
@@ -70,7 +64,6 @@ volumes: {}
 #   environment:
 #     CATALOG_SERVICE_URL: http://catalog_service_1:5001
 #     ORDER_DB_PATH: /data/orders.db
-#     # Future preparation only: replica identity for sync work.
 #     ORDER_REPLICA_NAME: order_service_1
 #   volumes:
 #     - order_data_1:/data
@@ -94,7 +87,5 @@ volumes: {}
 #     - catalog_service_2
 #
 # volumes:
-#   catalog_data_1:
-#   catalog_data_2:
 #   order_data_1:
 #   order_data_2:
