@@ -3,6 +3,7 @@ from urllib.parse import quote
 
 from flask import Flask, jsonify
 
+from cache import catalog_cache, info_cache_key, search_cache_key
 from client import forward_request
 from config import CATALOG_REPLICA_URLS, ORDER_REPLICA_URLS
 from load_balancer import RoundRobin
@@ -41,26 +42,43 @@ def _proxy_response(status_code, payload):
     return jsonify(payload), status_code
 
 
-@app.get("/search/<topic>")
-def search(topic):
+def _get_catalog_read(cache_key, log_label, build_url):
+    cached = catalog_cache.get(cache_key)
+    if cached is not None:
+        status_code, payload = cached
+        logger.info("Cache hit for key %s", cache_key)
+        return _proxy_response(status_code, payload)
+
+    logger.info("Cache miss for key %s", cache_key)
     replica_name, base_url = catalog_balancer.next_replica()
-    url = f"{base_url.rstrip('/')}/search/{quote(topic, safe='')}"
-    logger.info("Incoming request: GET /search/%s", topic)
+    url = build_url(base_url)
     logger.info("Catalog request routed to %s", replica_name)
     logger.info("Backend call target: GET %s", url)
     status_code, payload = forward_request("GET", url)
+    catalog_cache.set(cache_key, status_code, payload)
     return _proxy_response(status_code, payload)
+
+
+@app.get("/search/<topic>")
+def search(topic):
+    logger.info("Incoming request: GET /search/%s", topic)
+    cache_key = search_cache_key(topic)
+    return _get_catalog_read(
+        cache_key,
+        topic,
+        lambda base_url: f"{base_url.rstrip('/')}/search/{quote(topic, safe='')}",
+    )
 
 
 @app.get("/info/<item_id>")
 def info(item_id):
-    replica_name, base_url = catalog_balancer.next_replica()
-    url = f"{base_url.rstrip('/')}/info/{item_id}"
     logger.info("Incoming request: GET /info/%s", item_id)
-    logger.info("Catalog request routed to %s", replica_name)
-    logger.info("Backend call target: GET %s", url)
-    status_code, payload = forward_request("GET", url)
-    return _proxy_response(status_code, payload)
+    cache_key = info_cache_key(item_id)
+    return _get_catalog_read(
+        cache_key,
+        item_id,
+        lambda base_url: f"{base_url.rstrip('/')}/info/{item_id}",
+    )
 
 
 @app.post("/purchase/<item_id>")
@@ -68,6 +86,7 @@ def purchase(item_id):
     replica_name, base_url = order_balancer.next_replica()
     url = f"{base_url.rstrip('/')}/purchase/{item_id}"
     logger.info("Incoming request: POST /purchase/%s", item_id)
+    logger.info("Purchase request bypasses cache")
     logger.info("Order request routed to %s", replica_name)
     logger.info("Backend call target: POST %s", url)
     status_code, payload = forward_request("POST", url)

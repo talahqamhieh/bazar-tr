@@ -141,6 +141,8 @@ py app.py
 
 If those env vars are not set, the front-end still defaults to the single Part 1 URLs on ports `5001` and `5002`.
 
+The front-end keeps an in-memory cache for catalog read responses (`GET /info/<item_id>` and `GET /search/<topic>`). There is no cache invalidation yet, so cached reads can become stale after catalog updates.
+
 ## Test the integrated local stack through the front-end
 
 ```powershell
