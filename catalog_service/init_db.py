@@ -7,7 +7,7 @@ BOOKS = [
     (2, "RPCs for Noobs", "distributed systems", 50, 5),
     (3, "Xen and the Art of Surviving Undergraduate School", "undergraduate school", 35, 7),
     (4, "Cooking for the Impatient Undergrad", "undergraduate school", 25, 6),
-    # Lab 2 placeholder values until the lab specifies exact catalog fields.
+    # Lab 2 additional books (IDs 5-7).
     (5, "How to finish Project 3 on time", "distributed systems", 45, 4),
     (6, "Why theory classes are so hard", "undergraduate school", 30, 5),
     (7, "Spring in the Pioneer Valley", "undergraduate school", 20, 4),

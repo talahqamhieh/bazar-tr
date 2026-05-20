@@ -3,10 +3,7 @@
 # This file can run two independent catalog replicas and two independent
 # order replicas from the same codebases.
 #
-# Not implemented yet in this file:
-# - performance measurements
-#
-# For current Part 1 single-catalog Docker work, use docker-compose.yml instead.
+# For Part 1 catalog-only Docker, use docker-compose.yml instead.
 
 services:
   catalog_service_1:

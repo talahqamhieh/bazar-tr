@@ -1,7 +1,8 @@
 import logging
+import time
 from urllib.parse import quote
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response
 
 from cache import catalog_cache, info_cache_key, search_cache_key
 from client import forward_request
@@ -31,23 +32,32 @@ def server_error(error):
     return jsonify({"message": "Internal server error"}), 500
 
 
-def _proxy_response(status_code, payload):
-    if status_code == 500 and payload.get("message") == "Backend service unavailable":
-        logger.info("Backend failure: backend service unavailable")
-        return jsonify(payload), status_code
+def _make_json_response(status_code, payload, cache_status=None, response_time_ms=None):
+    response = make_response(jsonify(payload), status_code)
+    if cache_status is not None:
+        response.headers["X-Cache-Status"] = cache_status
+    if response_time_ms is not None:
+        response.headers["X-Response-Time-Ms"] = f"{response_time_ms:.2f}"
+        logger.info(
+            "Request completed in %.2f ms (cache %s)",
+            response_time_ms,
+            cache_status,
+        )
     if status_code >= 400:
         logger.info("Backend failure: status %s", status_code)
-    else:
+    elif cache_status is None:
         logger.info("Success response: status %s", status_code)
-    return jsonify(payload), status_code
+    return response
 
 
-def _get_catalog_read(cache_key, log_label, build_url):
+def _get_catalog_read(cache_key, build_url):
+    start = time.perf_counter()
     cached = catalog_cache.get(cache_key)
     if cached is not None:
         status_code, payload = cached
+        elapsed_ms = (time.perf_counter() - start) * 1000
         logger.info("Cache hit for key %s", cache_key)
-        return _proxy_response(status_code, payload)
+        return _make_json_response(status_code, payload, "hit", elapsed_ms)
 
     logger.info("Cache miss for key %s", cache_key)
     replica_name, base_url = catalog_balancer.next_replica()
@@ -56,7 +66,8 @@ def _get_catalog_read(cache_key, log_label, build_url):
     logger.info("Backend call target: GET %s", url)
     status_code, payload = forward_request("GET", url)
     catalog_cache.set(cache_key, status_code, payload)
-    return _proxy_response(status_code, payload)
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    return _make_json_response(status_code, payload, "miss", elapsed_ms)
 
 
 @app.get("/search/<topic>")
@@ -65,7 +76,6 @@ def search(topic):
     cache_key = search_cache_key(topic)
     return _get_catalog_read(
         cache_key,
-        topic,
         lambda base_url: f"{base_url.rstrip('/')}/search/{quote(topic, safe='')}",
     )
 
@@ -76,7 +86,6 @@ def info(item_id):
     cache_key = info_cache_key(item_id)
     return _get_catalog_read(
         cache_key,
-        item_id,
         lambda base_url: f"{base_url.rstrip('/')}/info/{item_id}",
     )
 
@@ -100,6 +109,7 @@ def invalidate(item_id):
 
 @app.post("/purchase/<item_id>")
 def purchase(item_id):
+    start = time.perf_counter()
     replica_name, base_url = order_balancer.next_replica()
     url = f"{base_url.rstrip('/')}/purchase/{item_id}"
     logger.info("Incoming request: POST /purchase/%s", item_id)
@@ -107,7 +117,9 @@ def purchase(item_id):
     logger.info("Order request routed to %s", replica_name)
     logger.info("Backend call target: POST %s", url)
     status_code, payload = forward_request("POST", url)
-    return _proxy_response(status_code, payload)
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    logger.info("Purchase request completed in %.2f ms", elapsed_ms)
+    return _make_json_response(status_code, payload)
 
 
 if __name__ == "__main__":

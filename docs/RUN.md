@@ -1,6 +1,16 @@
 # Run Guide
 
-This guide matches the current repository state. The catalog, order, and front-end services can be run locally for Part 1 integration testing. Docker currently supports the catalog service only.
+How to run Bazar.com locally and in Docker. Use the front-end on port **5000** as the only client entry point for normal use.
+
+## Port summary
+
+| Service | Default port |
+|---------|----------------|
+| Front-end | 5000 |
+| Catalog | 5001 |
+| Order | 5002 |
+| Catalog replica 2 | 5011 |
+| Order replica 2 | 5012 |
 
 ## Prerequisites
 
@@ -74,6 +84,7 @@ $env:ORDER_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order
 $env:ORDER_PORT = "5002"
 $env:CATALOG_SERVICE_URL = "http://127.0.0.1:5001"
 $env:ORDER_PEER_URL = "http://127.0.0.1:5012"
+$env:FRONTEND_INVALIDATION_URL = "http://127.0.0.1:5000"
 py init_db.py
 py app.py
 ```
@@ -87,6 +98,7 @@ $env:ORDER_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order
 $env:ORDER_PORT = "5012"
 $env:CATALOG_SERVICE_URL = "http://127.0.0.1:5001"
 $env:ORDER_PEER_URL = "http://127.0.0.1:5002"
+$env:FRONTEND_INVALIDATION_URL = "http://127.0.0.1:5000"
 py init_db.py
 py app.py
 ```
@@ -121,6 +133,7 @@ py app.py
 ```powershell
 cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service"
 py -m pip install -r requirements.txt
+$env:FRONTEND_INVALIDATION_URL = "http://127.0.0.1:5000"
 py app.py
 ```
 
@@ -146,6 +159,8 @@ py app.py
 If those env vars are not set, the front-end still defaults to the single Part 1 URLs on ports `5001` and `5002`.
 
 The front-end keeps an in-memory cache for catalog read responses (`GET /info/<item_id>` and `GET /search/<topic>`). Before a purchase updates catalog quantity, the order service calls `POST /internal/invalidate/<item_id>` on the front-end. Search cache entries are cleared on invalidation because quantity or price changes can make topic search results stale.
+
+For cache timing experiments, see `docs/PERFORMANCE.md`. Read responses include `X-Cache-Status` and `X-Response-Time-Ms` headers.
 
 ## Test the integrated local stack through the front-end
 
@@ -193,8 +208,31 @@ To re-seed manually inside a one-off container:
 docker compose run --rm catalog_service python init_db.py
 ```
 
-## Later phases
+## Docker: Part 1 catalog only
 
-`docker-compose.yml` includes commented placeholders for `frontend_service` and `order_service`. Those services are implemented locally, but they are not part of the current Docker workflow yet.
+`docker-compose.yml` runs the catalog service only. Front-end and order are implemented locally but not in that file.
 
-`docker-compose.lab2.yml` can run catalog replicas, order replicas, and the front-end with replica URL lists in Docker.
+## Docker: full Lab 2 stack
+
+From the repository root:
+
+```powershell
+cd "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2"
+docker compose -f docker-compose.lab2.yml build
+docker compose -f docker-compose.lab2.yml up
+```
+
+Client URL: `http://127.0.0.1:5000`
+
+Stop and remove volumes:
+
+```powershell
+docker compose -f docker-compose.lab2.yml down -v
+```
+
+## Recommended local startup order (Lab 2 demo)
+
+1. Catalog replica 1 and 2 (or single catalog on 5001 for simpler tests)
+2. Order replica 1 and 2 (or single order on 5002)
+3. Front-end with `CATALOG_REPLICA_URLS` and `ORDER_REPLICA_URLS` if using replicas
+4. Run tests through port **5000** only
