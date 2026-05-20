@@ -43,6 +43,7 @@ services:
       ORDER_PORT: 5002
       CATALOG_SERVICE_URL: http://catalog_service_1:5001
       ORDER_PEER_URL: http://order_service_2:5002
+      FRONTEND_INVALIDATION_URL: http://frontend_service:5000
     volumes:
       - order_data_1:/data
     depends_on:
@@ -59,6 +60,7 @@ services:
       ORDER_PORT: 5002
       CATALOG_SERVICE_URL: http://catalog_service_1:5001
       ORDER_PEER_URL: http://order_service_1:5002
+      FRONTEND_INVALIDATION_URL: http://frontend_service:5000
     volumes:
       - order_data_2:/data
     depends_on:

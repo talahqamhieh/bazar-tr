@@ -21,6 +21,16 @@ def bad_request(error):
     return jsonify({"message": "Bad request"}), 400
 
 
+@app.get("/")
+def home():
+    return jsonify({"service": SERVICE_NAME, "status": "running"}), 200
+
+
+@app.get("/health")
+def health():
+    return jsonify({"service": SERVICE_NAME, "status": "ok"}), 200
+
+
 @app.get("/search/<topic>")
 def search(topic):
     logger.info("[%s] Incoming request: GET /search/%s", SERVICE_NAME, topic)

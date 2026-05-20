@@ -32,6 +32,16 @@ def server_error(error):
     return jsonify({"message": "Internal server error"}), 500
 
 
+@app.get("/")
+def home():
+    return jsonify({"service": "frontend_service", "status": "running"}), 200
+
+
+@app.get("/health")
+def health():
+    return jsonify({"service": "frontend_service", "status": "ok"}), 200
+
+
 def _make_json_response(status_code, payload, cache_status=None, response_time_ms=None):
     response = make_response(jsonify(payload), status_code)
     if cache_status is not None:
