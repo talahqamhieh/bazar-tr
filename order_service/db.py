@@ -29,8 +29,30 @@ def init_db():
         conn.close()
 
 
-def log_purchase(item_id, title, price_at_purchase):
-    purchased_at = datetime.now(timezone.utc).isoformat()
+def log_purchase(item_id, title, price_at_purchase, purchased_at=None):
+    if purchased_at is None:
+        purchased_at = datetime.now(timezone.utc).isoformat()
+    conn = get_connection()
+    try:
+        conn.execute(
+            """
+            INSERT INTO orders (item_id, title, price_at_purchase, purchased_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (item_id, title, price_at_purchase, purchased_at),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return {
+        "item_id": item_id,
+        "title": title,
+        "price_at_purchase": price_at_purchase,
+        "purchased_at": purchased_at,
+    }
+
+
+def save_synced_order(item_id, title, price_at_purchase, purchased_at):
     conn = get_connection()
     try:
         conn.execute(

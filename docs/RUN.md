@@ -73,6 +73,7 @@ $env:ORDER_SERVICE_NAME = "order_service_1"
 $env:ORDER_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service\orders.db"
 $env:ORDER_PORT = "5002"
 $env:CATALOG_SERVICE_URL = "http://127.0.0.1:5001"
+$env:ORDER_PEER_URL = "http://127.0.0.1:5012"
 py init_db.py
 py app.py
 ```
@@ -85,11 +86,12 @@ $env:ORDER_SERVICE_NAME = "order_service_2"
 $env:ORDER_DB_PATH = "c:\Users\Talah Qamhieh\OneDrive\Desktop\dos\part1, 2\order_service\orders_replica_2.db"
 $env:ORDER_PORT = "5012"
 $env:CATALOG_SERVICE_URL = "http://127.0.0.1:5001"
+$env:ORDER_PEER_URL = "http://127.0.0.1:5002"
 py init_db.py
 py app.py
 ```
 
-Each order replica keeps its own SQLite log file. Purchases handled by one replica are logged only in that replica's database.
+Each order replica keeps its own SQLite log file. Set `ORDER_PEER_URL` to the other replica's base URL so successful purchases sync to the peer through `POST /internal/sync_order`.
 
 To reinitialize one order replica database, run `py init_db.py` again in that replica's terminal with the same environment variables.
 

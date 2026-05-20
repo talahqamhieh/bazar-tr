@@ -10,3 +10,4 @@ FRONTEND_INVALIDATION_URL = os.environ.get(
 )
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "orders.db"
 DB_PATH = Path(os.environ.get("ORDER_DB_PATH", DEFAULT_DB_PATH))
+ORDER_PEER_URL = os.environ.get("ORDER_PEER_URL", "").strip()

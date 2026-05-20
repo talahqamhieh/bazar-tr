@@ -4,7 +4,6 @@
 # order replicas from the same codebases.
 #
 # Not implemented yet in this file:
-# - order replica synchronization
 # - performance measurements
 #
 # For current Part 1 single-catalog Docker work, use docker-compose.yml instead.
@@ -46,6 +45,7 @@ services:
       ORDER_SERVICE_NAME: order_service_1
       ORDER_PORT: 5002
       CATALOG_SERVICE_URL: http://catalog_service_1:5001
+      ORDER_PEER_URL: http://order_service_2:5002
     volumes:
       - order_data_1:/data
     depends_on:
@@ -61,6 +61,7 @@ services:
       ORDER_SERVICE_NAME: order_service_2
       ORDER_PORT: 5002
       CATALOG_SERVICE_URL: http://catalog_service_1:5001
+      ORDER_PEER_URL: http://order_service_1:5002
     volumes:
       - order_data_2:/data
     depends_on:
