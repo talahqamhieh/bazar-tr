@@ -1,3 +1,5 @@
+"""Replicate a successful purchase row to the peer order service."""
+
 import json
 import logging
 import urllib.error

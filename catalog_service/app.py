@@ -1,3 +1,5 @@
+"""Catalog service: book search, info, updates, and peer sync for Lab 2 replicas."""
+
 import logging
 
 from flask import Flask, jsonify, request

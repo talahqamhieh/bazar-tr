@@ -22,21 +22,27 @@ Distributed online bookstore for a university Distributed and Operating Systems 
 - Performance timing headers on read responses
 - Full Lab 2 stack in `docker-compose.lab2.yml`
 
-## Documentation
+## Documentation (submission)
+
+All professor-required deliverables are under **`docs/`**:
 
 | Document | Purpose |
 |----------|---------|
-| [docs/RUN.md](docs/RUN.md) | How to run services locally and in Docker |
+| [docs/DESIGN.md](docs/DESIGN.md) | **Design document** (~2–3 pages): architecture, tradeoffs, extensions, how to run |
+| [docs/SAMPLE_OUTPUT.md](docs/SAMPLE_OUTPUT.md) | **Program output** captured from real runs |
+| [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | **Performance results** (tables + ASCII charts) |
+| [docs/RUN.md](docs/RUN.md) | Step-by-step run instructions (local + Docker) |
 | [docs/API_CONTRACT.md](docs/API_CONTRACT.md) | HTTP API and status codes |
-| [docs/DESIGN.md](docs/DESIGN.md) | Architecture and design choices |
-| [docs/SAMPLE_OUTPUT.md](docs/SAMPLE_OUTPUT.md) | Example requests and responses |
-| [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Cache timing experiments |
 | [tests/manual_test_checklist.md](tests/manual_test_checklist.md) | Manual validation checklist |
 | [tests/sample_requests.md](tests/sample_requests.md) | Copy-paste test commands |
 
-## Quick start (Part 1 local)
+Source code includes inline comments in service modules (catalog, order, front-end cache and routing).
 
-Start catalog, order, and front-end in separate terminals, then use `http://127.0.0.1:5000` as the only client URL. See `docs/RUN.md` for exact commands.
+## Quick start
+
+**Docker (full Lab 2):** from repo root, `docker compose -f docker-compose.lab2.yml up` — client URL `http://127.0.0.1:5000`.
+
+**Local Part 1:** start catalog, order, and front-end in separate terminals; see `docs/RUN.md` for exact commands.
 
 ## Known simplifications
 

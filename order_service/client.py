@@ -1,3 +1,5 @@
+"""HTTP helpers for catalog reads/updates and front-end cache invalidation."""
+
 import json
 import logging
 import urllib.error

@@ -1,3 +1,5 @@
+"""SQLite access for the books table (search, info, update)."""
+
 import sqlite3
 
 from config import DB_PATH

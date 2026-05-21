@@ -1,3 +1,5 @@
+"""Order service: purchases, order log, cache invalidation, peer order sync."""
+
 import logging
 
 from flask import Flask, jsonify, request

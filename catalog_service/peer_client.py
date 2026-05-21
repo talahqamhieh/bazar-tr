@@ -1,3 +1,5 @@
+"""Push catalog writes to the peer replica (best-effort, no retry)."""
+
 import json
 import logging
 import urllib.error

@@ -1,4 +1,9 @@
+"""In-memory cache for catalog read responses (info and search keys)."""
+
+
 class InMemoryCache:
+    """Stores (status_code, json_payload) tuples keyed by info:/search: strings."""
+
     def __init__(self):
         self._store = {}
 
@@ -9,6 +14,7 @@ class InMemoryCache:
         self._store[key] = (status_code, payload)
 
     def invalidate_item(self, item_id):
+        """Drop one info entry and all search entries (topic results may be stale)."""
         info_key = info_cache_key(item_id)
         removed_info = info_key in self._store
         if removed_info:

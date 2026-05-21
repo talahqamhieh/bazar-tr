@@ -1,3 +1,5 @@
+"""SQLite access for the orders table (local log and peer sync inserts)."""
+
 import sqlite3
 from datetime import datetime, timezone
 

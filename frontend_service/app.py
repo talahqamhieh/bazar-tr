@@ -1,3 +1,5 @@
+"""Front-end service: client entry point, read cache, replica round-robin."""
+
 import logging
 import time
 from urllib.parse import quote
@@ -61,11 +63,12 @@ def _make_json_response(status_code, payload, cache_status=None, response_time_m
 
 
 def _get_catalog_read(cache_key, build_url):
+    """Serve a catalog read from cache or by forwarding to the next replica."""
     start = time.perf_counter()
     cached = catalog_cache.get(cache_key)
     if cached is not None:
         status_code, payload = cached
-        elapsed_ms = (time.perf_counter() - start) * 1000 # time after hit 
+        elapsed_ms = (time.perf_counter() - start) * 1000
         logger.info("Cache hit for key %s", cache_key)
         return _make_json_response(status_code, payload, "hit", elapsed_ms)
 
@@ -76,7 +79,7 @@ def _get_catalog_read(cache_key, build_url):
     logger.info("Backend call target: GET %s", url)
     status_code, payload = forward_request("GET", url)
     catalog_cache.set(cache_key, status_code, payload)
-    elapsed_ms = (time.perf_counter() - start) * 1000 # time after miss
+    elapsed_ms = (time.perf_counter() - start) * 1000
     return _make_json_response(status_code, payload, "miss", elapsed_ms)
 
 
@@ -100,8 +103,9 @@ def info(item_id):
     )
 
 
-@app.post("/internal/invalidate/<item_id>") # invalidate cache 
+@app.post("/internal/invalidate/<item_id>")
 def invalidate(item_id):
+    """Called by order service before catalog write; clears stale read cache."""
     logger.info("Invalidation request received for item_id %s", item_id)
     if not item_id.isdigit():
         return jsonify({"message": "Invalid item_id"}), 400
